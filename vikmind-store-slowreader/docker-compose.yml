@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      # The format here is: <app-id>_<docker-service-name>_1
+      APP_HOST: vikmind-store-slowreader_server_1
+      APP_PORT: 2553
+
+  # The image runs as user 65532, but Umbrel creates the data folder as user 1000
+  init:
+    image: busybox:1.37.0@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec
+    command: chown -R 65532:65532 /data
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
+
+  server:
+    image: ghcr.io/hplush/slowreader:0.20261119.1@sha256:7fe26734f411eeb675765466dd0e0b2b5d549f3dc2c2f5037d0367993f3859d9
+    restart: on-failure
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: file:///data
+      # Passkeys and CORS work only on this exact origin, users can change it in app settings
+      WEB_ORIGIN: http://${DEVICE_DOMAIN_NAME}:${APP_PROXY_PORT}
+      PROXY_ORIGIN: ^https?://${DEVICE_DOMAIN_NAME}:${APP_PROXY_PORT}$$
+    volumes:
+      - ${APP_DATA_DIR}/data:/data

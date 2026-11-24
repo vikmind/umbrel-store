@@ -1,0 +1,53 @@
+manifestVersion: 1
+id: vikmind-store-slowreader
+storage:
+  dataRoot: data
+environment:
+  - name: WEB_ORIGIN
+    services:
+      - server
+    default: http://umbrel.local:2553
+    note: Exact address you open Slow Reader at, like http://192.168.1.10:2553. Passkeys and sync work only on this address. Change PROXY_ORIGIN to match.
+  - name: PROXY_ORIGIN
+    services:
+      - server
+    default: ^https?://umbrel.local:2553$
+    note: Regular expression for addresses allowed to load feeds through the built-in proxy, like ^https?://192\.168\.1\.10:2553$. Must match WEB_ORIGIN.
+category: social
+name: Slow Reader
+version: "0.20261119.1"
+tagline: Web app coach to help you read more thoughtful content from your feeds
+icon: https://raw.githubusercontent.com/hplush/slowreader/main/web/public/icon.svg
+description: >-
+  Slow Reader is a web app coach to help you read more thoughtful content from your feeds.
+
+
+  - Combine all feeds (social media, RSS) in a single app.
+
+  - Track how each subscription is useful for you.
+
+  - Split subscriptions to Useful (slow/deep) and Fun (fast-food).
+
+  - Spend more time on slow content by blocking fast in the evening, etc.
+
+
+  Slow Reader is local-first: your browser stores all feeds and posts and checks them for new posts.
+  This server syncs data between your devices with end-to-end encryption and includes the CORS proxy
+  the web client needs to load feeds.
+releaseNotes: ""
+
+developer: hplush
+website: https://slowreader.app
+dependencies: []
+repo: https://github.com/hplush/slowreader
+support: https://github.com/hplush/slowreader/issues
+
+port: 2553
+gallery: []
+path: ""
+
+defaultUsername: ""
+defaultPassword: ""
+
+submitter: vikmind
+submission: https://github.com/hplush/slowreader
