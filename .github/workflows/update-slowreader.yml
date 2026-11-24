@@ -1,0 +1,47 @@
+name: Update Slow Reader
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      APP: vikmind-store-slowreader
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bump to latest release
+        run: |
+          set -euo pipefail
+          latest=$(gh release view -R hplush/slowreader --json tagName -q .tagName)
+          current=$(grep -oP '^version: "\K[^"]+' $APP/umbrel-app.yml)
+          echo "current=$current latest=$latest"
+          [ "$latest" = "$current" ] && exit 0
+          branch="update-slowreader-$latest"
+          git ls-remote --exit-code origin "$branch" >/dev/null && { echo "PR branch exists"; exit 0; }
+
+          # Multi-arch index digest, same value Umbrel expects in the image pin
+          token=$(curl -fsS "https://ghcr.io/token?scope=repository:hplush/slowreader:pull" | jq -r .token)
+          digest=$(curl -fsSI -H "Authorization: Bearer $token" \
+            -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json" \
+            "https://ghcr.io/v2/hplush/slowreader/manifests/$latest" | grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
+          [[ "$digest" == sha256:* ]] || { echo "no digest for $latest"; exit 1; }
+
+          sed -i "s|^version: \".*\"|version: \"$latest\"|" $APP/umbrel-app.yml
+          sed -i "s|ghcr.io/hplush/slowreader:.*|ghcr.io/hplush/slowreader:$latest@$digest|" $APP/docker-compose.yml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git commit -am "Update Slow Reader to $latest"
+          git push origin "$branch"
+          gh pr create --title "Update Slow Reader to $latest" \
+            --body "Release notes: https://github.com/hplush/slowreader/releases/tag/$latest"
