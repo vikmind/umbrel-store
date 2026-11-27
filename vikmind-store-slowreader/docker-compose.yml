@@ -15,7 +15,7 @@ services:
       - ${APP_DATA_DIR}/data:/data
 
   server:
-    image: ghcr.io/hplush/slowreader:0.20261119.1@sha256:7fe26734f411eeb675765466dd0e0b2b5d549f3dc2c2f5037d0367993f3859d9
+    image: ghcr.io/hplush/slowreader:0.20261126.0@sha256:d9c72a8d5270682f58ac9feec34919506acfc95572b09663639ab878e797e413
     restart: on-failure
     depends_on:
       init:

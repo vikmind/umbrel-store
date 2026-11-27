@@ -15,7 +15,7 @@ environment:
     note: Regular expression for addresses allowed to load feeds through the built-in proxy, like ^https?://192\.168\.1\.10:2553$. Must match WEB_ORIGIN.
 category: social
 name: Slow Reader
-version: "0.20261119.1"
+version: "0.20261126.0"
 tagline: Web app coach to help you read more thoughtful content from your feeds
 icon: https://raw.githubusercontent.com/hplush/slowreader/main/web/public/icon.svg
 description: >-
